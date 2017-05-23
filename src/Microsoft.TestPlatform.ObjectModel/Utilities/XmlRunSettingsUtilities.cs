@@ -27,8 +27,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             get
             {
 #if NET46
-                // This is a workaround for https://github.com/dotnet/corefx/issues/13566
-                return WindowsSystemInformation.GetArchitecture();
+                int p = (int) Environment.OSVersion.Platform;
+                if ((p == 4) || (p == 6) || (p == 128)) {
+                    return IntPtr.Size == 8 ? ObjectModel.Architecture.X64 : ObjectModel.Architecture.X86;
+                } else {
+	                // This is a workaround for https://github.com/dotnet/corefx/issues/13566
+	                return WindowsSystemInformation.GetArchitecture();
+                }
 #else
                 var arch = RuntimeInformation.OSArchitecture;
 

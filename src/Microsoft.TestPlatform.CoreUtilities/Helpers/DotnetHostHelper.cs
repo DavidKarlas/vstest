@@ -36,21 +36,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <inheritdoc />
         public string GetDotnetHostFullPath()
         {
-            char separator = ';';
             var dotnetExeName = "dotnet.exe";
 
-#if !NET46
-            // Use semicolon(;) as path separator for windows
-            // colon(:) for Linux and OSX
+#if NET46
+            int p = (int) Environment.OSVersion.Platform;
+            if ((p == 4) || (p == 6) || (p == 128)) {
+                dotnetExeName = "dotnet";
+            }
+#else
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                separator = ':';
                 dotnetExeName = "dotnet";
             }
 #endif
 
             var pathString = Environment.GetEnvironmentVariable("PATH");
-            foreach (string path in pathString.Split(separator))
+            foreach (string path in pathString.Split(Path.PathSeparator))
             {
                 string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
                 if (this.fileHelper.Exists(exeFullPath))
